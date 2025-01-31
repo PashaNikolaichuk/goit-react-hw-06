@@ -1,8 +1,13 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import s from "./ContactForm.module.css";
+import { useDispatch } from "react-redux";
+import { nanoid } from "@reduxjs/toolkit";
+import { addTask } from "../../redux/contactsSlice";
 
-const ContactForm = ({ addNewContact }) => {
+const ContactForm = () => {
+  // ми повідомляємо Redux, що треба виконати певну дію, і ця дія змінить стан у store.
+  const dispatch = useDispatch();
   const validationSchema = Yup.object({
     name: Yup.string()
       .min(3, "Name must be at least 3 characters")
@@ -22,9 +27,15 @@ const ContactForm = ({ addNewContact }) => {
         number: "",
       }}
       validationSchema={validationSchema}
-      // сабмітить дані у values і передаєм ії у addNewContact
-      onSubmit={(values, { resetForm }) => {
-        addNewContact(values), resetForm();
+      // сабмітить дані у values
+      onSubmit={(values, options) => {
+        const newContact = {
+          id: nanoid(),
+          name: values.name,
+          number: values.number,
+        };
+        dispatch(addTask(newContact));
+        options.resetForm();
       }}
     >
       <Form className={s.form}>
